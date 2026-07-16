@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>استودیو آزاد | داشبورد پروژه‌ها</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B1220">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="استودیو آزاد">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root{
+    --bg: #0B1220;
+    --panel: #121A2B;
+    --panel-2: #17233A;
+    --border: #223049;
+    --text: #E6EBF5;
+    --muted: #8B9BB8;
+    --teal: #34D399;
+    --teal-dim: rgba(52,211,153,0.15);
+    --blue: #38BDF8;
+    --red: #FB7185;
+    --red-dim: rgba(251,113,133,0.15);
+    --gold: #FBBF24;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background: radial-gradient(1200px 600px at 20% -10%, #14203a 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+    direction:rtl;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px;}
+  .header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:24px;flex-wrap:wrap;gap:12px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--teal);box-shadow:0 0 14px var(--teal);}
+  .brand h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px;}
+  .brand span{color:var(--muted);font-size:13px;}
+  .add-btn{
+    background:linear-gradient(135deg,var(--teal),#10B981);
+    color:#04140D;border:none;padding:11px 20px;border-radius:10px;
+    font-weight:700;font-size:14px;cursor:pointer;
+    box-shadow:0 6px 20px rgba(52,211,153,.25);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .add-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(52,211,153,.35);}
+  .add-btn:active{transform:translateY(0);}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:26px;}
+  @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:480px){.cards{grid-template-columns:1fr;gap:10px;} .card{padding:14px 16px;}}
+  .card{
+    background:linear-gradient(160deg,var(--panel),var(--panel-2));
+    border:1px solid var(--border);border-radius:14px;padding:18px 18px;
+    position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0 0 auto 0;height:3px;
+    background:var(--accent,var(--teal));
+  }
+  .card .label{color:var(--muted);font-size:12.5px;margin-bottom:8px;}
+  .card .value{font-size:21px;font-weight:800;color:var(--accent,var(--teal));direction:ltr;text-align:right;unicode-bidi:plaintext;}
+  .card.blue{--accent:var(--blue);}
+  .card.red{--accent:var(--red);}
+  .card.gold{--accent:var(--gold);}
+
+  .table-panel{
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    overflow:hidden;
+  }
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    background:#0E1729;color:var(--muted);font-size:12.5px;font-weight:700;
+    text-align:center;padding:14px 10px;border-bottom:1px solid var(--border);
+    position:sticky;top:0;
+  }
+  tbody tr{border-bottom:1px solid var(--border);transition:background .15s ease;}
+  tbody tr:hover{background:rgba(255,255,255,0.02);}
+  tbody tr.settled{background:rgba(52,211,153,0.05);}
+  td{padding:10px;text-align:center;font-size:13.5px;vertical-align:middle;}
+  td.name-cell{text-align:right;}
+  input[type=text], input[type=number]{
+    background:#0E1729;border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:8px 10px;font-size:13.5px;font-family:inherit;
+    width:100%;text-align:center;
+  }
+  input[type=text]{text-align:right;}
+  input[type=number]{max-width:90px;}
+  input:focus{outline:none;border-color:var(--teal);}
+  .status-pill{
+    display:inline-block;padding:5px 12px;border-radius:999px;font-weight:700;
+    font-size:12.5px;background:#1B2740;color:var(--text);min-width:52px;
+  }
+  .status-pill.done{background:var(--teal-dim);color:var(--teal);}
+  .amount-input{max-width:130px;}
+  .price-input{max-width:110px;}
+  .extra-input{max-width:110px;}
+  .computed-amt{color:var(--blue);font-weight:700;font-variant-numeric:tabular-nums;}
+  .checkbox-wrap{display:flex;align-items:center;justify-content:center;}
+  input[type=checkbox]{
+    width:20px;height:20px;accent-color:var(--teal);cursor:pointer;
+  }
+  .settled-amt{color:var(--muted);font-variant-numeric:tabular-nums;}
+  tr.settled .settled-amt{color:var(--teal);font-weight:700;}
+  .del-btn{
+    background:transparent;border:1px solid var(--border);color:var(--red);
+    border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:15px;
+    line-height:1;transition:all .15s ease;
+  }
+  .del-btn:hover{background:var(--red-dim);border-color:var(--red);}
+  .empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;}
+  .footer-note{
+    color:var(--muted);font-size:12px;text-align:center;margin-top:18px;
+  }
+  .save-indicator{
+    position:fixed;bottom:18px;left:18px;background:var(--panel-2);
+    border:1px solid var(--border);color:var(--muted);font-size:12px;
+    padding:8px 14px;border-radius:999px;opacity:0;transition:opacity .3s ease;
+    pointer-events:none;
+  }
+  .save-indicator.show{opacity:1;}
+
+  @media(max-width:720px){
+    .wrap{padding:20px 14px 50px;}
+    .brand h1{font-size:18px;}
+    .add-btn{padding:10px 16px;font-size:13.5px;}
+    .table-panel{background:transparent;border:none;border-radius:0;overflow:visible;}
+    table, thead, tbody, tr, td{display:block;width:100%;}
+    thead{display:none;}
+    tbody tr{
+      background:linear-gradient(160deg,var(--panel),var(--panel-2));
+      border:1px solid var(--border);border-radius:14px;
+      margin-bottom:12px;padding:4px 14px;
+    }
+    tbody tr:hover{background:linear-gradient(160deg,var(--panel),var(--panel-2));}
+    td{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:11px 0;text-align:right;border-bottom:1px dashed var(--border);
+    }
+    td:last-child{border-bottom:none;}
+    td::before{
+      content:attr(data-label);color:var(--muted);font-size:12px;font-weight:700;
+      flex:0 0 auto;
+    }
+    td.name-cell{flex-direction:column;align-items:stretch;}
+    td.name-cell::before{margin-bottom:6px;}
+    input[type=text], input[type=number]{max-width:none;}
+    .price-input, .extra-input{max-width:140px;margin-right:auto;}
+    .del-cell{justify-content:center;padding:8px 0 12px;}
+    .del-cell::before{content:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <h1>استودیو آزاد</h1>
+        <span>داشبورد مدیریت پروژه‌ها</span>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addProject()">+ افزودن پروژه</button>
+  </div>
+
+  <div class="cards">
+    <div class="card blue">
+      <div class="label">جمع کل مبلغ پروژه‌ها</div>
+      <div class="value" id="totalAmount">۰ تومان</div>
+    </div>
+    <div class="card">
+      <div class="label">جمع کل تسویه‌شده</div>
+      <div class="value" id="totalSettled">۰ تومان</div>
+    </div>
+    <div class="card red">
+      <div class="label">باقی‌مانده تسویه‌نشده</div>
+      <div class="value" id="totalRemaining">۰ تومان</div>
+    </div>
+    <div class="card gold">
+      <div class="label">جمع ویدیوهای ادیت‌شده</div>
+      <div class="value" id="totalEdited">۰</div>
+    </div>
+    <div class="card red">
+      <div class="label">جمع ویدیوهای ادیت‌نشده</div>
+      <div class="value" id="totalUnedited">۰</div>
+    </div>
+  </div>
+
+  <div class="table-panel">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%;">نام پروژه</th>
+          <th>تعداد ویدیو</th>
+          <th>تعداد ادیت‌شده</th>
+          <th>وضعیت</th>
+          <th>قیمت هر ویدیو (تومان)</th>
+          <th>مبلغ اضافه (تومان)</th>
+          <th>مبلغ تسویه (خودکار)</th>
+          <th>تسویه شده؟</th>
+          <th>مبلغ تسویه‌شده</th>
+          <th style="width:44px;"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="emptyMsg" style="display:none;">هنوز پروژه‌ای اضافه نکردی. روی «افزودن پروژه» بزن.</div>
+  </div>
+
+  <div class="footer-note">اطلاعات به‌صورت خودکار ذخیره می‌شود و فقط برای شما قابل مشاهده است.</div>
+</div>
+
+<div class="save-indicator" id="saveIndicator">ذخیره شد ✓</div>
+
+<script>
+const STORAGE_KEY = 'studio-azad-projects-v1';
+let projects = [];
+let saveTimer = null;
+
+function uid(){ return 'p' + Date.now() + Math.random().toString(36).slice(2,7); }
+
+function fmtToman(n){
+  n = Math.round(n || 0);
+  return n.toLocaleString('en-US') + ' تومان';
+}
+
+async function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      projects = JSON.parse(raw);
+    }
+  }catch(e){
+    projects = [];
+  }
+  if(projects.length === 0){
+    projects = [{
+      id: uid(), name: 'نمونه: تیزر افتتاحیه نگین نصر',
+      totalVideos: 10, editedVideos: 10, pricePerVideo: 500000, extraAmount: 0, settled: true
+    }];
+  }
+  // migrate old records that stored a flat "amount" instead of a per-video price
+  projects.forEach(p => {
+    if(p.pricePerVideo === undefined){
+      p.pricePerVideo = p.totalVideos > 0 ? Math.round((p.amount||0) / p.totalVideos) : (p.amount||0);
+      delete p.amount;
+    }
+    if(p.extraAmount === undefined){
+      p.extraAmount = 0;
+    }
+  });
+  render();
+}
+
+async function saveData(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+    const ind = document.getElementById('saveIndicator');
+    ind.classList.add('show');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=> ind.classList.remove('show'), 1200);
+  }catch(e){
+    console.error('storage error', e);
+  }
+}
+
+function amountOf(p){
+  return (p.pricePerVideo || 0) * (p.totalVideos || 0) + (p.extraAmount || 0);
+}
+
+function addProject(){
+  projects.push({id: uid(), name:'', totalVideos:0, editedVideos:0, pricePerVideo:0, extraAmount:0, settled:false});
+  renderTable();
+  updateSummary();
+  saveData();
+}
+
+function removeProject(id){
+  projects = projects.filter(p => p.id !== id);
+  renderTable();
+  updateSummary();
+  saveData();
+}
+
+// Updates only the state + the small derived bits of ONE row (pill, settled amount,
+// row highlight) plus the summary cards. Never touches the <input> elements, so
+// focus/cursor position is preserved while typing.
+function updateField(id, field, value, tr){
+  const p = projects.find(p => p.id === id);
+  if(!p) return;
+
+  if(field === 'settled'){
+    p.settled = value;
+  }else if(field === 'name'){
+    p.name = value;
+  }else if(field === 'pricePerVideo'){
+    p.pricePerVideo = Math.max(0, Number(value)||0);
+  }else if(field === 'extraAmount'){
+    p.extraAmount = Math.max(0, Number(value)||0);
+  }else if(field === 'totalVideos'){
+    p.totalVideos = Math.max(0, Number(value)||0);
+  }else if(field === 'editedVideos'){
+    p.editedVideos = Math.max(0, Number(value)||0);
+  }
+
+  refreshRowDerived(tr, p);
+  updateSummary();
+  saveData();
+}
+
+function refreshRowDerived(tr, p){
+  const isDone = p.totalVideos > 0 && p.editedVideos === p.totalVideos;
+  const amount = amountOf(p);
+  const settledAmt = p.settled ? amount : 0;
+
+  tr.classList.toggle('settled', !!p.settled);
+
+  const pill = tr.querySelector('.status-pill');
+  pill.textContent = p.totalVideos ? (p.editedVideos + '/' + p.totalVideos) : '—';
+  pill.classList.toggle('done', isDone);
+
+  tr.querySelector('.computed-amt').textContent = fmtToman(amount);
+  tr.querySelector('.settled-amt').textContent = fmtToman(settledAmt);
+}
+
+function updateSummary(){
+  let totalAmount = 0, totalSettled = 0, totalEdited = 0, totalUnedited = 0;
+  projects.forEach(p => {
+    const amount = amountOf(p);
+    totalAmount += amount;
+    totalSettled += p.settled ? amount : 0;
+    totalEdited += p.editedVideos;
+    totalUnedited += Math.max(0, (p.totalVideos || 0) - (p.editedVideos || 0));
+  });
+  document.getElementById('totalAmount').textContent = fmtToman(totalAmount);
+  document.getElementById('totalSettled').textContent = fmtToman(totalSettled);
+  document.getElementById('totalRemaining').textContent = fmtToman(totalAmount - totalSettled);
+  document.getElementById('totalEdited').textContent = totalEdited.toLocaleString('en-US');
+  document.getElementById('totalUnedited').textContent = totalUnedited.toLocaleString('en-US');
+}
+
+function render(){
+  renderTable();
+  updateSummary();
+}
+
+function renderTable(){
+  const tbody = document.getElementById('tbody');
+  const emptyMsg = document.getElementById('emptyMsg');
+  tbody.innerHTML = '';
+  emptyMsg.style.display = projects.length === 0 ? 'block' : 'none';
+
+  projects.forEach(p => {
+    const isDone = p.totalVideos > 0 && p.editedVideos === p.totalVideos;
+    const amount = amountOf(p);
+    const settledAmt = p.settled ? amount : 0;
+
+    const tr = document.createElement('tr');
+    if(p.settled) tr.classList.add('settled');
+
+    tr.innerHTML = `
+      <td class="name-cell" data-label="نام پروژه"><input type="text" value="${escapeHtml(p.name)}" placeholder="نام پروژه" data-field="name"></td>
+      <td data-label="تعداد ویدیو"><input type="number" min="0" value="${p.totalVideos}" data-field="totalVideos"></td>
+      <td data-label="تعداد ادیت‌شده"><input type="number" min="0" value="${p.editedVideos}" data-field="editedVideos"></td>
+      <td data-label="وضعیت"><span class="status-pill ${isDone ? 'done' : ''}">${p.totalVideos ? p.editedVideos + '/' + p.totalVideos : '—'}</span></td>
+      <td data-label="قیمت هر ویدیو"><input type="number" min="0" step="10000" class="price-input" value="${p.pricePerVideo}" data-field="pricePerVideo"></td>
+      <td data-label="مبلغ اضافه"><input type="number" min="0" step="10000" class="extra-input" value="${p.extraAmount}" data-field="extraAmount"></td>
+      <td class="computed-amt" data-label="مبلغ تسویه (خودکار)">${fmtToman(amount)}</td>
+      <td data-label="تسویه شده؟"><div class="checkbox-wrap"><input type="checkbox" ${p.settled ? 'checked' : ''} data-field="settled"></div></td>
+      <td class="settled-amt" data-label="مبلغ تسویه‌شده">${fmtToman(settledAmt)}</td>
+      <td class="del-cell"><button class="del-btn" title="حذف پروژه">×</button></td>
+    `;
+
+    tr.querySelectorAll('input[data-field]').forEach(inp => {
+      const field = inp.dataset.field;
+      const evt = (field === 'settled') ? 'change' : 'input';
+      inp.addEventListener(evt, () => {
+        const val = field === 'settled' ? inp.checked : inp.value;
+        updateField(p.id, field, val, tr);
+      });
+    });
+    tr.querySelector('.del-btn').addEventListener('click', () => removeProject(p.id));
+
+    tbody.appendChild(tr);
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+loadData();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
