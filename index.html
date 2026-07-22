@@ -1,17 +1,7 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<html lang="fa" dir="rtl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>استودیو آزاد | داشبورد پروژه‌ها</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0B1220">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="استودیو آزاد">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" href="icon-192.png">
 <style>
   :root{
     --bg: #0B1220;
@@ -27,7 +17,7 @@
     --red-dim: rgba(251,113,133,0.15);
     --gold: #FBBF24;
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{
     margin:0;padding:0;height:100%;
     background: radial-gradient(1200px 600px at 20% -10%, #14203a 0%, var(--bg) 55%);
@@ -41,7 +31,7 @@
     margin-bottom:24px;flex-wrap:wrap;gap:12px;
   }
   .brand{display:flex;align-items:center;gap:12px;}
-  .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--teal);box-shadow:0 0 14px var(--teal);}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--teal);box-shadow:0 0 14px var(--teal);flex-shrink:0;}
   .brand h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px;}
   .brand span{color:var(--muted);font-size:13px;}
   .add-btn{
@@ -50,13 +40,14 @@
     font-weight:700;font-size:14px;cursor:pointer;
     box-shadow:0 6px 20px rgba(52,211,153,.25);
     transition:transform .15s ease, box-shadow .15s ease;
+    white-space:nowrap;
   }
   .add-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(52,211,153,.35);}
   .add-btn:active{transform:translateY(0);}
 
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:26px;}
   @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr);}}
-  @media(max-width:480px){.cards{grid-template-columns:1fr;gap:10px;} .card{padding:14px 16px;}}
+  @media(max-width:480px){.cards{grid-template-columns:1fr;gap:10px;}}
   .card{
     background:linear-gradient(160deg,var(--panel),var(--panel-2));
     border:1px solid var(--border);border-radius:14px;padding:18px 18px;
@@ -100,16 +91,12 @@
     font-size:12.5px;background:#1B2740;color:var(--text);min-width:52px;
   }
   .status-pill.done{background:var(--teal-dim);color:var(--teal);}
-  .amount-input{max-width:130px;}
   .price-input{max-width:110px;}
   .extra-input{max-width:110px;}
+  .settled-input{max-width:120px;}
   .computed-amt{color:var(--blue);font-weight:700;font-variant-numeric:tabular-nums;}
-  .checkbox-wrap{display:flex;align-items:center;justify-content:center;}
-  input[type=checkbox]{
-    width:20px;height:20px;accent-color:var(--teal);cursor:pointer;
-  }
-  .settled-amt{color:var(--muted);font-variant-numeric:tabular-nums;}
-  tr.settled .settled-amt{color:var(--teal);font-weight:700;}
+  .remaining-amt{color:var(--red);font-weight:700;font-variant-numeric:tabular-nums;}
+  tr.settled .remaining-amt{color:var(--teal);}
   .del-btn{
     background:transparent;border:1px solid var(--border);color:var(--red);
     border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:15px;
@@ -119,6 +106,7 @@
   .empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;}
   .footer-note{
     color:var(--muted);font-size:12px;text-align:center;margin-top:18px;
+    line-height:1.8;
   }
   .save-indicator{
     position:fixed;bottom:18px;left:18px;background:var(--panel-2);
@@ -128,34 +116,79 @@
   }
   .save-indicator.show{opacity:1;}
 
-  @media(max-width:720px){
-    .wrap{padding:20px 14px 50px;}
-    .brand h1{font-size:18px;}
-    .add-btn{padding:10px 16px;font-size:13.5px;}
+  .priority-cell{display:flex;align-items:center;justify-content:center;gap:6px;}
+  .drag-handle{
+    cursor:grab;color:var(--muted);font-size:18px;user-select:none;
+    padding:6px 4px;line-height:1;touch-action:none;
+  }
+  .drag-handle:active{cursor:grabbing;}
+  .priority-badge{
+    width:24px;height:24px;border-radius:50%;background:#0E1729;
+    border:1px solid var(--border);color:var(--gold);font-weight:800;
+    font-size:12px;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .reorder-btns{display:flex;flex-direction:column;gap:2px;}
+  .reorder-btns button{
+    background:transparent;border:1px solid var(--border);color:var(--text);
+    border-radius:5px;width:22px;height:18px;font-size:10px;cursor:pointer;
+    line-height:1;padding:0;display:flex;align-items:center;justify-content:center;
+    transition:all .15s ease;
+  }
+  .reorder-btns button:hover{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+  .reorder-btns button:disabled{opacity:.25;cursor:default;}
+  .reorder-btns button:disabled:hover{background:transparent;border-color:var(--border);color:var(--text);}
+  tbody tr.dragging{opacity:.35;}
+  tbody tr.drag-over-top{box-shadow:inset 0 3px 0 0 var(--teal);}
+  tbody tr.drag-over-bottom{box-shadow:inset 0 -3px 0 0 var(--teal);}
+
+  /* ---------- Mobile card layout ---------- */
+  @media(max-width:760px){
+    .wrap{padding:18px 12px 50px;}
+    .header{margin-bottom:18px;}
+    .brand h1{font-size:17px;}
+    .brand span{font-size:11.5px;}
+    .add-btn{padding:10px 16px;font-size:13px;width:100%;}
+    .card{padding:14px 16px;}
+    .card .value{font-size:18px;}
+
     .table-panel{background:transparent;border:none;border-radius:0;overflow:visible;}
-    table, thead, tbody, tr, td{display:block;width:100%;}
+    table, tbody{display:block;width:100%;}
     thead{display:none;}
     tbody tr{
+      display:grid;grid-template-columns:1fr 1fr;gap:0 10px;
       background:linear-gradient(160deg,var(--panel),var(--panel-2));
       border:1px solid var(--border);border-radius:14px;
-      margin-bottom:12px;padding:4px 14px;
+      padding:12px 14px;margin-bottom:12px;
     }
+    tbody tr.settled{background:linear-gradient(160deg,var(--panel),var(--panel-2));border-color:rgba(52,211,153,0.35);}
     tbody tr:hover{background:linear-gradient(160deg,var(--panel),var(--panel-2));}
     td{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:11px 0;text-align:right;border-bottom:1px dashed var(--border);
+      display:flex;flex-direction:column;align-items:flex-start;gap:5px;
+      padding:9px 2px;text-align:right;border-bottom:1px dashed rgba(255,255,255,0.06);
     }
-    td:last-child{border-bottom:none;}
-    td::before{
-      content:attr(data-label);color:var(--muted);font-size:12px;font-weight:700;
-      flex:0 0 auto;
-    }
-    td.name-cell{flex-direction:column;align-items:stretch;}
-    td.name-cell::before{margin-bottom:6px;}
-    input[type=text], input[type=number]{max-width:none;}
-    .price-input, .extra-input{max-width:140px;margin-right:auto;}
-    .del-cell{justify-content:center;padding:8px 0 12px;}
-    .del-cell::before{content:none;}
+    td.name-cell{text-align:right;}
+    td::before{content:attr(data-label);font-size:11px;color:var(--muted);font-weight:700;}
+    td input[type=text], td input[type=number]{max-width:100%;text-align:right;font-size:16px;padding:9px 10px;}
+    td .status-pill{font-size:12.5px;}
+
+    td:nth-child(1){order:1;grid-column:1/-1;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:4px;}
+    td:nth-child(1) .priority-cell{justify-content:flex-start;width:100%;}
+    td:nth-child(2){order:2;grid-column:1/-1;}
+    td:nth-child(3){order:3;}
+    td:nth-child(4){order:4;}
+    td:nth-child(5){order:5;grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;}
+    td:nth-child(6){order:6;}
+    td:nth-child(7){order:7;}
+    td:nth-child(8){order:8;grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;}
+    td:nth-child(8)::before{margin-left:auto;}
+    td:nth-child(9){order:9;grid-column:1/-1;}
+    td:nth-child(10){order:10;grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;border-bottom:none;}
+    td:nth-child(10)::before{margin-left:auto;}
+    td:nth-child(11){order:11;grid-column:1/-1;border-bottom:none;padding-top:2px;}
+    td:nth-child(11)::before{display:none;}
+    .del-btn{width:100%;height:38px;border-radius:9px;font-size:14px;}
+    .del-btn::after{content:" حذف پروژه";font-size:12.5px;vertical-align:middle;}
   }
 </style>
 </head>
@@ -176,23 +209,23 @@
   <div class="cards">
     <div class="card blue">
       <div class="label">جمع کل مبلغ پروژه‌ها</div>
-      <div class="value" id="totalAmount">۰ تومان</div>
+      <div class="value" id="totalAmount">0 تومان</div>
     </div>
     <div class="card">
       <div class="label">جمع کل تسویه‌شده</div>
-      <div class="value" id="totalSettled">۰ تومان</div>
+      <div class="value" id="totalSettled">0 تومان</div>
     </div>
     <div class="card red">
       <div class="label">باقی‌مانده تسویه‌نشده</div>
-      <div class="value" id="totalRemaining">۰ تومان</div>
+      <div class="value" id="totalRemaining">0 تومان</div>
     </div>
     <div class="card gold">
       <div class="label">جمع ویدیوهای ادیت‌شده</div>
-      <div class="value" id="totalEdited">۰</div>
+      <div class="value" id="totalEdited">0</div>
     </div>
     <div class="card red">
       <div class="label">جمع ویدیوهای ادیت‌نشده</div>
-      <div class="value" id="totalUnedited">۰</div>
+      <div class="value" id="totalUnedited">0</div>
     </div>
   </div>
 
@@ -200,15 +233,16 @@
     <table>
       <thead>
         <tr>
-          <th style="width:18%;">نام پروژه</th>
+          <th style="width:64px;">اولویت</th>
+          <th style="width:16%;">نام پروژه</th>
           <th>تعداد ویدیو</th>
           <th>تعداد ادیت‌شده</th>
           <th>وضعیت</th>
           <th>قیمت هر ویدیو (تومان)</th>
           <th>مبلغ اضافه (تومان)</th>
-          <th>مبلغ تسویه (خودکار)</th>
-          <th>تسویه شده؟</th>
+          <th>مبلغ کل (خودکار)</th>
           <th>مبلغ تسویه‌شده</th>
+          <th>باقی‌مانده</th>
           <th style="width:44px;"></th>
         </tr>
       </thead>
@@ -217,7 +251,7 @@
     <div class="empty" id="emptyMsg" style="display:none;">هنوز پروژه‌ای اضافه نکردی. روی «افزودن پروژه» بزن.</div>
   </div>
 
-  <div class="footer-note">اطلاعات به‌صورت خودکار ذخیره می‌شود و فقط برای شما قابل مشاهده است.</div>
+  <div class="footer-note">اطلاعات به‌صورت خودکار ذخیره می‌شود و فقط برای شما قابل مشاهده است. برای تغییر اولویت، ردیف رو از روی آیکون ⠿ بکش و جابه‌جا کن، یا از فلش‌های بالا/پایین استفاده کن. باقی‌مانده به‌طور خودکار از مبلغ کل منهای مبلغ تسویه‌شده حساب می‌شود.</div>
 </div>
 
 <div class="save-indicator" id="saveIndicator">ذخیره شد ✓</div>
@@ -246,10 +280,10 @@ async function loadData(){
   if(projects.length === 0){
     projects = [{
       id: uid(), name: 'نمونه: تیزر افتتاحیه نگین نصر',
-      totalVideos: 10, editedVideos: 10, pricePerVideo: 500000, extraAmount: 0, settled: true
+      totalVideos: 10, editedVideos: 10, pricePerVideo: 500000, extraAmount: 0, settledAmount: 5000000
     }];
   }
-  // migrate old records that stored a flat "amount" instead of a per-video price
+  // migrate old records
   projects.forEach(p => {
     if(p.pricePerVideo === undefined){
       p.pricePerVideo = p.totalVideos > 0 ? Math.round((p.amount||0) / p.totalVideos) : (p.amount||0);
@@ -257,6 +291,12 @@ async function loadData(){
     }
     if(p.extraAmount === undefined){
       p.extraAmount = 0;
+    }
+    if(p.settledAmount === undefined){
+      // migrate from old boolean "settled" flag
+      const amount = amountOf(p);
+      p.settledAmount = p.settled ? amount : 0;
+      delete p.settled;
     }
   });
   render();
@@ -278,8 +318,12 @@ function amountOf(p){
   return (p.pricePerVideo || 0) * (p.totalVideos || 0) + (p.extraAmount || 0);
 }
 
+function remainingOf(p){
+  return amountOf(p) - (p.settledAmount || 0);
+}
+
 function addProject(){
-  projects.push({id: uid(), name:'', totalVideos:0, editedVideos:0, pricePerVideo:0, extraAmount:0, settled:false});
+  projects.push({id: uid(), name:'', totalVideos:0, editedVideos:0, pricePerVideo:0, extraAmount:0, settledAmount:0});
   renderTable();
   updateSummary();
   saveData();
@@ -292,16 +336,14 @@ function removeProject(id){
   saveData();
 }
 
-// Updates only the state + the small derived bits of ONE row (pill, settled amount,
+// Updates only the state + the small derived bits of ONE row (pill, computed amounts,
 // row highlight) plus the summary cards. Never touches the <input> elements, so
 // focus/cursor position is preserved while typing.
 function updateField(id, field, value, tr){
   const p = projects.find(p => p.id === id);
   if(!p) return;
 
-  if(field === 'settled'){
-    p.settled = value;
-  }else if(field === 'name'){
+  if(field === 'name'){
     p.name = value;
   }else if(field === 'pricePerVideo'){
     p.pricePerVideo = Math.max(0, Number(value)||0);
@@ -311,6 +353,8 @@ function updateField(id, field, value, tr){
     p.totalVideos = Math.max(0, Number(value)||0);
   }else if(field === 'editedVideos'){
     p.editedVideos = Math.max(0, Number(value)||0);
+  }else if(field === 'settledAmount'){
+    p.settledAmount = Math.max(0, Number(value)||0);
   }
 
   refreshRowDerived(tr, p);
@@ -321,24 +365,24 @@ function updateField(id, field, value, tr){
 function refreshRowDerived(tr, p){
   const isDone = p.totalVideos > 0 && p.editedVideos === p.totalVideos;
   const amount = amountOf(p);
-  const settledAmt = p.settled ? amount : 0;
+  const remaining = remainingOf(p);
+  const isSettled = amount > 0 && remaining <= 0;
 
-  tr.classList.toggle('settled', !!p.settled);
+  tr.classList.toggle('settled', isSettled);
 
   const pill = tr.querySelector('.status-pill');
   pill.textContent = p.totalVideos ? (p.editedVideos + '/' + p.totalVideos) : '—';
   pill.classList.toggle('done', isDone);
 
   tr.querySelector('.computed-amt').textContent = fmtToman(amount);
-  tr.querySelector('.settled-amt').textContent = fmtToman(settledAmt);
+  tr.querySelector('.remaining-amt').textContent = fmtToman(remaining);
 }
 
 function updateSummary(){
   let totalAmount = 0, totalSettled = 0, totalEdited = 0, totalUnedited = 0;
   projects.forEach(p => {
-    const amount = amountOf(p);
-    totalAmount += amount;
-    totalSettled += p.settled ? amount : 0;
+    totalAmount += amountOf(p);
+    totalSettled += (p.settledAmount || 0);
     totalEdited += p.editedVideos;
     totalUnedited += Math.max(0, (p.totalVideos || 0) - (p.editedVideos || 0));
   });
@@ -363,36 +407,96 @@ function renderTable(){
   projects.forEach(p => {
     const isDone = p.totalVideos > 0 && p.editedVideos === p.totalVideos;
     const amount = amountOf(p);
-    const settledAmt = p.settled ? amount : 0;
+    const remaining = remainingOf(p);
+    const isSettled = amount > 0 && remaining <= 0;
 
     const tr = document.createElement('tr');
-    if(p.settled) tr.classList.add('settled');
+    if(isSettled) tr.classList.add('settled');
+    tr.draggable = true;
+    tr.dataset.id = p.id;
 
+    const idx = projects.indexOf(p);
     tr.innerHTML = `
+      <td data-label="اولویت">
+        <div class="priority-cell">
+          <span class="drag-handle" title="بکش و جابه‌جا کن">⠿</span>
+          <span class="priority-badge">${idx + 1}</span>
+          <div class="reorder-btns">
+            <button type="button" class="move-up" title="بالاتر" ${idx === 0 ? 'disabled' : ''}>▲</button>
+            <button type="button" class="move-down" title="پایین‌تر" ${idx === projects.length - 1 ? 'disabled' : ''}>▼</button>
+          </div>
+        </div>
+      </td>
       <td class="name-cell" data-label="نام پروژه"><input type="text" value="${escapeHtml(p.name)}" placeholder="نام پروژه" data-field="name"></td>
       <td data-label="تعداد ویدیو"><input type="number" min="0" value="${p.totalVideos}" data-field="totalVideos"></td>
       <td data-label="تعداد ادیت‌شده"><input type="number" min="0" value="${p.editedVideos}" data-field="editedVideos"></td>
       <td data-label="وضعیت"><span class="status-pill ${isDone ? 'done' : ''}">${p.totalVideos ? p.editedVideos + '/' + p.totalVideos : '—'}</span></td>
       <td data-label="قیمت هر ویدیو"><input type="number" min="0" step="10000" class="price-input" value="${p.pricePerVideo}" data-field="pricePerVideo"></td>
       <td data-label="مبلغ اضافه"><input type="number" min="0" step="10000" class="extra-input" value="${p.extraAmount}" data-field="extraAmount"></td>
-      <td class="computed-amt" data-label="مبلغ تسویه (خودکار)">${fmtToman(amount)}</td>
-      <td data-label="تسویه شده؟"><div class="checkbox-wrap"><input type="checkbox" ${p.settled ? 'checked' : ''} data-field="settled"></div></td>
-      <td class="settled-amt" data-label="مبلغ تسویه‌شده">${fmtToman(settledAmt)}</td>
-      <td class="del-cell"><button class="del-btn" title="حذف پروژه">×</button></td>
+      <td class="computed-amt" data-label="مبلغ کل">${fmtToman(amount)}</td>
+      <td data-label="مبلغ تسویه‌شده"><input type="number" min="0" step="10000" class="settled-input" value="${p.settledAmount || 0}" data-field="settledAmount"></td>
+      <td class="remaining-amt" data-label="باقی‌مانده">${fmtToman(remaining)}</td>
+      <td data-label=""><button class="del-btn" title="حذف پروژه">×</button></td>
     `;
 
     tr.querySelectorAll('input[data-field]').forEach(inp => {
-      const field = inp.dataset.field;
-      const evt = (field === 'settled') ? 'change' : 'input';
-      inp.addEventListener(evt, () => {
-        const val = field === 'settled' ? inp.checked : inp.value;
-        updateField(p.id, field, val, tr);
+      inp.addEventListener('input', () => {
+        updateField(p.id, inp.dataset.field, inp.value, tr);
       });
     });
     tr.querySelector('.del-btn').addEventListener('click', () => removeProject(p.id));
 
+    tr.querySelector('.move-up').addEventListener('click', () => moveProject(p.id, -1));
+    tr.querySelector('.move-down').addEventListener('click', () => moveProject(p.id, 1));
+
+    tr.addEventListener('dragstart', () => {
+      tr.classList.add('dragging');
+    });
+    tr.addEventListener('dragend', () => {
+      tr.classList.remove('dragging');
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over-top','drag-over-bottom'));
+    });
+    tr.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const dragging = tbody.querySelector('tr.dragging');
+      if(!dragging || dragging === tr) return;
+      const rect = tr.getBoundingClientRect();
+      const before = (e.clientY - rect.top) < rect.height / 2;
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over-top','drag-over-bottom'));
+      tr.classList.add(before ? 'drag-over-top' : 'drag-over-bottom');
+    });
+    tr.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const draggingRow = tbody.querySelector('tr.dragging');
+      if(!draggingRow || draggingRow === tr) return;
+      reorderProjects(draggingRow.dataset.id, tr.dataset.id, tr.classList.contains('drag-over-top'));
+    });
+
     tbody.appendChild(tr);
   });
+}
+
+function moveProject(id, delta){
+  const from = projects.findIndex(p => p.id === id);
+  if(from === -1) return;
+  const to = from + delta;
+  if(to < 0 || to >= projects.length) return;
+  const [moved] = projects.splice(from, 1);
+  projects.splice(to, 0, moved);
+  renderTable();
+  saveData();
+}
+
+function reorderProjects(draggedId, targetId, insertBefore){
+  const from = projects.findIndex(p => p.id === draggedId);
+  if(from === -1) return;
+  const [moved] = projects.splice(from, 1);
+  let to = projects.findIndex(p => p.id === targetId);
+  if(to === -1){ to = projects.length; }
+  else if(!insertBefore){ to += 1; }
+  projects.splice(to, 0, moved);
+  renderTable();
+  saveData();
 }
 
 function escapeHtml(str){
@@ -402,12 +506,6 @@ function escapeHtml(str){
 }
 
 loadData();
-
-if("serviceWorker" in navigator){
-  window.addEventListener("load", function(){
-    navigator.serviceWorker.register("sw.js").catch(function(){});
-  });
-}
 </script>
-</body>
-</html>
+
+</body></html>
